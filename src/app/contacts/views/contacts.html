@@ -1,0 +1,18 @@
+<div class="contacts-router">
+    <div class="span3">
+        <div class="pa-sidebar well well-small">
+            <ul class="nav nav-list">
+                <li ng-class="{ active: $state.includes('contacts.list') }">
+                    <a ui-sref="contacts.list">All Contacts</a>
+                </li>
+                <li class="nav-header">Top Contacts</li>
+                <li ng-repeat="contact in contacts | limitTo:2" ui-sref-active="active">
+                    <a ui-sref="contacts.detail({contactId:contact.id})">{{contact.name}}</a>
+                </li>
+            </ul>
+            <hr>
+            <button class="btn">Show random contact</button>
+        </div>
+      </div>
+    <div ui-view class="contact-detail"></div>
+</div>

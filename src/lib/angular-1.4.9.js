@@ -3,6 +3,14 @@ publishExternalAPI({});
 function publishExternalAPI(angular){
     extend({},angular);
     angularModule = setupModuleLoader(window);
+    // angular.module('ng',['nglocale'],['$provider',function(){}])
+    // {
+    //     name:'ng'
+    //     _invokeQueue:[ ['$injector','invoke',['$provider',function(){}]] ],
+    //     _configBlocks:[],
+    //     _runBlocks:[],
+    //     requies:['ngLocale']
+    // }
     angularModule('ng',['ngLocale'],[
         '$provide',
         function($provide){
@@ -17,73 +25,80 @@ function setupModuleLoader(window){
     var angular = window.angular || {};
     var module = angular.module = function(){
         var modules = {};
+        // angular.module('name',[],configFn)
         return function(name,requies,configFn){
-            var invokeQueue = [];// array
-            var configBlocks = [];// functions
-            var runBlocks = []; // functions
-            //var config = invokeLater('$injector', 'invoke', 'push', configBlocks);
-            var config = function(){
-                invokeQueue.push(['$injector','invoke',arguments]);
-                return moduleInstance;
-            }
-            var moduleInstance = {
-                _invokeQueue:invokeQueue,
-                _configBlocks:configBlocks,
-                _runBlocks:runBlocks,
-                requies:requies,
-                name:name,
-                provider:function(recipeName, factoryFunction){
-                    invokeQueue.push(['$provide', 'provider',recipeName, factoryFunction]);
-                },
-                factory:function(recipeName, factoryFunction){
-                    invokeQueue.push(['$provide', 'factory',recipeName, factoryFunction]);    
-                },
-                service:function(recipeName, factoryFunction){
-                    invokeQueue.push(['$provide', 'service',recipeName, factoryFunction]);    
-                },
-                value:function(recipeName, factoryFunction){
-                    invokeQueue.push(['$provide', 'value',recipeName, factoryFunction]);    
-                },
-                constant:function(recipeName, factoryFunction){
-                    invokeQueue.unshift(['$provide', 'constant',recipeName, factoryFunction]);    
-                },
-                decorator:function(recipeName, factoryFunction){
-                    invokeQueue.push(['$provide', 'decorator',recipeName, factoryFunction]);    
-                },
-                animation:function(recipeName, factoryFunction){
-                    invokeQueue.push(['$animateProvider', 'register',recipeName, factoryFunction]);    
-                },
-                filter:function(recipeName, factoryFunction){
-                    invokeQueue.push(['$filterProvider', 'register',recipeName, factoryFunction]);    
-                },
-                controller:function(recipeName, factoryFunction){
-                    invokeQueue.push(['$controllerProvider', 'register',recipeName, factoryFunction]);    
-                },
-                directive:function(recipeName, factoryFunction){
-                    invokeQueue.push(['$compileProvider', 'directive',recipeName, factoryFunction]);    
-                },
-                config:config,
-                run:function(blocks){
-                    runBlocks.push(blocks);
-                    return this;
+            var module = modules[name] || 
+            function(){
+                var invokeQueue = [];// array
+                var configBlocks = [];// functions
+                var runBlocks = []; // functions
+                //var config = invokeLater('$injector', 'invoke', 'push', configBlocks);
+                var config = function(){
+                    invokeQueue.push(['$injector','invoke',arguments]);
+                    return moduleInstance;
                 }
-            };
-            if(configFn){
-                config(configFn);
+                var moduleInstance = {
+                    _invokeQueue:invokeQueue,
+                    _configBlocks:configBlocks,
+                    _runBlocks:runBlocks,
+                    requies:requies,
+                    name:name,
+                    provider:function(recipeName, factoryFunction){
+                        invokeQueue.push(['$provide', 'provider',recipeName, factoryFunction]);
+                    },
+                    factory:function(recipeName, factoryFunction){
+                        invokeQueue.push(['$provide', 'factory',recipeName, factoryFunction]);    
+                    },
+                    service:function(recipeName, factoryFunction){
+                        invokeQueue.push(['$provide', 'service',recipeName, factoryFunction]);    
+                    },
+                    value:function(recipeName, factoryFunction){
+                        invokeQueue.push(['$provide', 'value',recipeName, factoryFunction]);    
+                    },
+                    constant:function(recipeName, factoryFunction){
+                        invokeQueue.unshift(['$provide', 'constant',recipeName, factoryFunction]);    
+                    },
+                    decorator:function(recipeName, factoryFunction){
+                        invokeQueue.push(['$provide', 'decorator',recipeName, factoryFunction]);    
+                    },
+                    animation:function(recipeName, factoryFunction){
+                        invokeQueue.push(['$animateProvider', 'register',recipeName, factoryFunction]);    
+                    },
+                    filter:function(recipeName, factoryFunction){
+                        invokeQueue.push(['$filterProvider', 'register',recipeName, factoryFunction]);    
+                    },
+                    controller:function(recipeName, factoryFunction){
+                        invokeQueue.push(['$controllerProvider', 'register',recipeName, factoryFunction]);    
+                    },
+                    directive:function(recipeName, factoryFunction){
+                        invokeQueue.push(['$compileProvider', 'directive',recipeName, factoryFunction]);    
+                    },
+                    config:config,
+                    run:function(blocks){
+                        runBlocks.push(blocks);
+                        return this;
+                    }
+                };
+                if(configFn){
+                    config(configFn);
+                }
+                return moduleInstance;
+                function invokeLater(){}
+                function invokeLaterAndSetModuleName(provider, method){}
             }
-            return moduleInstance;
-
-            function invokeLater(){
-                
-            }
-            function invokeLaterAndSetModuleName(provider, method){
-
-            }
+            return typeof module === 'function' ? module = (modules[name] = module()) : module;
         }
     }
     return module();
 }
-
+// angular.module('ngLocale',[],['$provider',function(){}])
+// {
+//     name:'ng'
+//     _invokeQueue:[ ['$injector','invoke',['$provider',function(){}]] ],
+//     _configBlocks:[],
+//     _runBlocks:[],
+//     requies:[]
+// }
 angular.module('ngLocale',[],[
     '$provide',
     function($provide){
@@ -180,13 +195,36 @@ function createInjector(modulesToLoad){
         function runInvokeQueue(queue){
             var i, ii;
             for (i = 0, ii = queue.length; i < ii; i++) {
+                //[providerInjector,method,arguments]
             var invokeArgs = queue[i],
                 provider = providerInjector.get(invokeArgs[0]);
+                // providerInjector method.apply(providerInjector,arguments)
                 provider[invokeArgs[1]].apply(provider, invokeArgs[2]);
             }
         }
+        // angular.module('ng',['nglocale'])
+        // angular.module('ngLocale',[])
+        // ['$provider',function(){}]
+        // angular.module('ng',['nglocale'],['$provider',function(){}])
+        // {
+        //     name:'ng'
+        //     _invokeQueue:[ ['$injector','invoke',['$provider',function(){}]] ],
+        //     _configBlocks:[],
+        //     _runBlocks:[],
+        //     requies:['ngLocale']
+        // }
+        // angular.module('ngLocale',[],['$provider',function(){}])
+        // {
+        //     name:'ng'
+        //     _invokeQueue:[ ['$injector','invoke',['$provider',function(){}]] ],
+        //     _configBlocks:[],
+        //     _runBlocks:[],
+        //     requies:[]
+        // }
         try{
             if (isString(module)) {
+                // ng
+                // ngLocale
                 moduleFn = angularModule(module);
                 runBlocks = runBlocks.concat(loadModules(moduleFn.requires)).concat(moduleFn._runBlocks);
                 runInvokeQueue(moduleFn._invokeQueue);

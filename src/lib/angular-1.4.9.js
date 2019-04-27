@@ -197,6 +197,7 @@ function createInjector(modulesToLoad){
             for (i = 0, ii = queue.length; i < ii; i++) {
                 //[providerInjector,method,arguments]
             var invokeArgs = queue[i],
+                // ['$injector','invoke',['$provider',function(){}]]
                 provider = providerInjector.get(invokeArgs[0]);
                 // providerInjector method.apply(providerInjector,arguments)
                 provider[invokeArgs[1]].apply(provider, invokeArgs[2]);
@@ -239,6 +240,7 @@ function createInjector(modulesToLoad){
         }catch(err){
 
         }
+        return runBlocks
     }
     function createInternalInjector(cache, factory){
         function getService(serviceName,caller){

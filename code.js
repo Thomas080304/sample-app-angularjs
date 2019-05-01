@@ -1,9 +1,12 @@
 /**
- * angularJS 核心概念
+ * angularJS 核心概念 
+ * mvc 从module中分离view，从view中分离controller
+ * view观察module的变化，on('changeEvent',function(){view.render()})
+ * view委托事件给controller on('viewEvent',functiono(){module})
  * module
+ * dependency injection
  * scope(controller)
  * directive
- * dependency injection
  */
 var app = angular.module('app',[]);
 app.controller('app.ctrl',[

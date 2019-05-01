@@ -185,7 +185,7 @@ function createInjector(modulesToLoad){
             return instanceInjector.invoke(provider.$get, provider, undefined, serviceName);
         });
     forEach(loadModules(modulesToLoad),function(fn){ if(fn){instanceInjector.invoke(fn)} });
-    return instanceCache;
+    return instanceInjector;
 
     function provider(name, provider_){
         return providerCache[name + providerSuffix] = provider_;
@@ -193,6 +193,7 @@ function createInjector(modulesToLoad){
     function factory(){}
     function loadModules(modulesToLoad){
         function runInvokeQueue(queue){
+            // providerCache {$provider:{},$injector:{}}
             var i, ii;
             for (i = 0, ii = queue.length; i < ii; i++) {
                 //[providerInjector,method,arguments]
@@ -235,7 +236,7 @@ function createInjector(modulesToLoad){
             } else if (isArray(module)) {
                 runBlocks.push(providerInjector.invoke(module));
             } else {
-            assertArgFn(module, 'module');
+                assertArgFn(module, 'module');
             }
         }catch(err){
 

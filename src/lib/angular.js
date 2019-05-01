@@ -4353,7 +4353,10 @@ function createInjector(modulesToLoad, strictDi) {
           }));
 
 
-  forEach(loadModules(modulesToLoad), function(fn) { if (fn) instanceInjector.invoke(fn); });
+  forEach(loadModules(modulesToLoad), function(fn) { 
+    debugger;
+    if (fn) instanceInjector.invoke(fn); 
+  });
 
   return instanceInjector;
 

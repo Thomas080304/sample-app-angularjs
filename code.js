@@ -1,3 +1,10 @@
+/**
+ * angularJS 核心概念
+ * module
+ * scope(controller)
+ * directive
+ * dependency injection
+ */
 var app = angular.module('app',[]);
 app.controller('app.ctrl',[
     '$scope',
